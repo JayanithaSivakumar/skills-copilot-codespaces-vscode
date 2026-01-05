@@ -152,11 +152,18 @@ function getMultipleItemsInefficient(items, ids) {
 // Optimized: O(n + m) using Map for O(1) lookups
 function getMultipleItemsOptimized(items, ids) {
     const itemMap = new Map(items.map(item => [item.id, item]));
-    return ids.map(id => itemMap.get(id)).filter(item => item !== undefined);
+    // Use reduce to avoid intermediate arrays
+    return ids.reduce((result, id) => {
+        const item = itemMap.get(id);
+        if (item !== undefined) {
+            result.push(item);
+        }
+        return result;
+    }, []);
 }
 ```
 
-**Benefit:** O(n + m) time complexity, ~1000-10000% faster for large datasets
+**Benefit:** O(n + m) time complexity, no intermediate arrays, ~1000-10000% faster for large datasets
 
 ---
 

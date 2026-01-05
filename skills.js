@@ -1,7 +1,7 @@
 // ===== INEFFICIENT CODE EXAMPLES (BEFORE OPTIMIZATION) =====
 
 // 1. Inefficient: Using multiple loops where one would suffice
-function processArraysInefficient(arr1, arr2) {
+function processArraysInefficient(arr1) {
     let doubled = [];
     for (let i = 0; i < arr1.length; i++) {
         doubled.push(arr1[i] * 2);
@@ -73,7 +73,7 @@ function getMultipleItemsInefficient(items, ids) {
 // ===== OPTIMIZED CODE EXAMPLES (AFTER IMPROVEMENTS) =====
 
 // 1. OPTIMIZED: Single loop with chaining
-function processArraysOptimized(arr1, arr2) {
+function processArraysOptimized(arr1) {
     // Use reduce for single-pass processing
     return arr1.reduce((sum, num) => {
         const doubled = num * 2;
@@ -111,16 +111,28 @@ function calculateExpensiveOptimized(data) {
 function getMultipleItemsOptimized(items, ids) {
     // Create a Map for O(1) lookups - O(n) time instead of O(n*m)
     const itemMap = new Map(items.map(item => [item.id, item]));
-    return ids.map(id => itemMap.get(id)).filter(item => item !== undefined);
+    // Use reduce to avoid intermediate array from filter
+    return ids.reduce((result, id) => {
+        const item = itemMap.get(id);
+        if (item !== undefined) {
+            result.push(item);
+        }
+        return result;
+    }, []);
 }
 
 // ===== PERFORMANCE COMPARISON UTILITIES =====
 
 // Helper function to measure execution time
 function measurePerformance(fn, ...args) {
-    const start = performance.now();
+    // Use performance.now() if available (browser/modern Node.js), otherwise Date.now()
+    const perfNow = typeof performance !== 'undefined' && performance.now 
+        ? () => performance.now() 
+        : () => Date.now();
+    
+    const start = perfNow();
     const result = fn(...args);
-    const end = performance.now();
+    const end = perfNow();
     return {
         result: result,
         time: end - start
